@@ -79,5 +79,5 @@ sourceFusing2.useStream((res) => {
 const filter = document.querySelector("#filter");
 filter.addEventListener(
   "click",
-  source3.useEventStream((data) => data, true)
+  source3.useEventStream((data) => data,true)
 );

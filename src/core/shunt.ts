@@ -5,6 +5,6 @@ export default function (fusingSource, pipes, callback) {
   for (let i = 0; i < len; i++) {
     const stream = new Stream(fusingSource);
     stream.setPipe(pipes[i]);
-    stream.useStream(callback[i], false);
+    stream.useStream(callback[i]);
   }
 }

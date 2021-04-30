@@ -11,7 +11,7 @@ export default class Stream {
   private firstExecution: Boolean = true;
   private shuntPipes: Array<Array<(unknown) => unknown>> = [];
   private shuntCallbacks: Array<(unknown) => unknown> = [];
-  private isshunt: Boolean = false;
+  private isshunt: Boolean;
   constructor(source?: unknown) {
     this.source = source;
   }
@@ -28,26 +28,25 @@ export default class Stream {
     return this;
   }
   public useStream(callback: (unknown) => unknown, isshunt: boolean = false) {
-    if (!this.isshunt) {
-      this.usePipes().then((d) => {
-        this.pending = false;
-        return callback(d);
-      });
+    if (isshunt) {
+      this.usePipes()
+        .then((d) => {
+          this.pending = false;
+          return callback(d);
+        })
+        .then((d) => {
+          shunt(
+            d,
+            this.shuntPipes,
+            this.shuntCallbacks
+          );
+        });
     } else {
-      if (isshunt) {
-        this.usePipes()
-          .then((d) => {
-            this.pending = false;
-            return callback(d);
-          })
-          .then((d) => {
-            this.isshunt = false;
-            shunt(
-              d,
-              this.shuntPipes,
-              this.shuntCallbacks
-            );
-          });
+      if (!this.isshunt) {
+        this.usePipes().then((d) => {
+          this.pending = false;
+          return callback(d);
+        });
       } else {
         this.shuntCallbacks.push(callback);
       }
