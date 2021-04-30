@@ -1,5 +1,4 @@
-import fusing from "./fusing";
-
+import shunt from "./shunt";
 interface Source {
   event: DocumentEvent;
   source: unknown;
@@ -10,16 +9,15 @@ export default class Stream {
   private pending: Boolean = false;
   private pipes: Array<(unknown) => unknown> = [];
   private firstExecution: Boolean = true;
-  private fusingSource: Promise<any> | any;
-  private fusingPipes: Array<Array<(unknown) => unknown>> = [];
-  private fusingCallbacks: Array<(unknown) => unknown> = [];
-  private isFusing: Boolean = false;
+  private shuntPipes: Array<Array<(unknown) => unknown>> = [];
+  private shuntCallbacks: Array<(unknown) => unknown> = [];
+  private isshunt: Boolean = false;
   constructor(source?: unknown) {
     this.source = source;
   }
   public pipe(...args: Array<(unknown) => unknown>) {
-    if (this.isFusing) {
-      this.fusingPipes.push(args);
+    if (this.isshunt) {
+      this.shuntPipes.push(args);
     } else {
       if (this.pipes.length) {
         this.pipes = this.pipes.concat(args);
@@ -27,32 +25,31 @@ export default class Stream {
         this.pipes = args;
       }
     }
-
     return this;
   }
-  public useStream(callback: (unknown) => unknown, isfusing: boolean = false) {
-    this.isFusing && !isfusing && this.fusingCallbacks.push(callback);
-    if (!this.isFusing) {
+  public useStream(callback: (unknown) => unknown, isshunt: boolean = false) {
+    if (!this.isshunt) {
       this.usePipes().then((d) => {
         this.pending = false;
         return callback(d);
       });
     } else {
-      if (isfusing) {
+      if (isshunt) {
         this.usePipes()
           .then((d) => {
             this.pending = false;
-            this.fusingSource = d;
             return callback(d);
           })
-          .then((_) => {
-            this.isFusing = false;
-            return fusing(
-              this.fusingSource,
-              this.fusingPipes,
-              this.fusingCallbacks
+          .then((d) => {
+            this.isshunt = false;
+            shunt(
+              d,
+              this.shuntPipes,
+              this.shuntCallbacks
             );
           });
+      } else {
+        this.shuntCallbacks.push(callback);
       }
     }
   }
@@ -68,7 +65,7 @@ export default class Stream {
   }
   public useEventStream(
     callback: (unknown) => unknown,
-    isfusing: boolean = false
+    isshunt: boolean = false
   ) {
     return (e) => {
       if (this.firstExecution) {
@@ -76,25 +73,15 @@ export default class Stream {
         this.cache = null;
         this.firstExecution = false;
       }
-      return this.useStream(callback, isfusing);
+      return this.useStream(callback, isshunt);
     };
   }
-  public fusing(source?: any) {
-    // this.fusingPipes = [];
-    // this.fusingSources = [];
-    // this.fusingCallbacks = [];
-    // this.pipes = [];
-    this.isFusing = true;
-    if (source) {
-      this.fusingSource = source;
-    }
+  public shunt() {
+    this.isshunt = true;
     return this;
   }
   public setPipe(pipes) {
     this.pipes = pipes;
     return this;
-  }
-  public setSource(source) {
-    this.source = source;
   }
 }

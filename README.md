@@ -21,7 +21,6 @@ For frameworks of component systems, such as React, Vue.js, etc., communication 
 import Stream from "./core/stream";
 import pluck from "./operator/pluck";
 import _ from "lodash";
-//channels
 const source = new Stream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
     res.json()
@@ -62,6 +61,7 @@ const source1 = new Stream(
 ).pipe(pluck("song", "0", "url"));
 
 source1.useStream((url: string) => {
+  console.log("url: ", url);
   const btn = document.querySelector("#btn");
   btn.addEventListener("click", () => {
     window.open(url);
@@ -81,19 +81,27 @@ click.addEventListener(
   })
 );
 
-// //filter
+// 分流
 
-const source3 = new Stream([0, 1, false, 2, "", 3]).pipe(
-  pluck("source"),
-  _.compact
-);
+const source3 = new Stream([0, 1, false, 2, "", 3]);
+
+const sourceFusing1 = source3.shunt().pipe(pluck("source"),_.compact);
+const sourceFusing2 = source3.shunt().pipe(pluck("event"));
+
+sourceFusing1.useStream((res) => {
+  console.log("sourceFusing1", res);
+});
+sourceFusing2.useStream((res) => {
+  console.log("sourceFusing2", res);
+});
+
+
 const filter = document.querySelector("#filter");
 filter.addEventListener(
   "click",
-  source3.useEventStream((data) => {
-    alert(data);
-  })
+  source3.useEventStream((data) => data, true)
 );
+
 ```
 
 [MIT](./LICENSE)

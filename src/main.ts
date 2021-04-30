@@ -1,6 +1,5 @@
 import Stream from "./core/stream";
 import pluck from "./operator/pluck";
-// import fusing from "./core/fusing";
 import _ from "lodash";
 const source = new Stream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
@@ -37,17 +36,17 @@ source.useStream((res) => {
   });
 });
 
-// const source1 = new Stream(
-//   fetch("http://api.jirengu.com/fm/v2/getSong.php").then((res) => res.json())
-// ).pipe(pluck("song", "0", "url"));
+const source1 = new Stream(
+  fetch("http://api.jirengu.com/fm/v2/getSong.php").then((res) => res.json())
+).pipe(pluck("song", "0", "url"));
 
-// source1.useStream((url: string) => {
-//   console.log("url: ", url);
-//   const btn = document.querySelector("#btn");
-//   btn.addEventListener("click", () => {
-//     window.open(url);
-//   });
-// });
+source1.useStream((url: string) => {
+  console.log("url: ", url);
+  const btn = document.querySelector("#btn");
+  btn.addEventListener("click", () => {
+    window.open(url);
+  });
+});
 
 // //event
 const source2 = new Stream(
@@ -62,15 +61,12 @@ click.addEventListener(
   })
 );
 
-// //filter compact
+// 分流
 
 const source3 = new Stream([0, 1, false, 2, "", 3]);
 
-const sourceFusing1 = source3.fusing().pipe(pluck("source"));
-// console.log("sourceFusing1: ", sourceFusing1);
-
-const sourceFusing2 = source3.fusing().pipe(pluck("event"));
-// console.log("sourceFusing2: ", sourceFusing2);
+const sourceFusing1 = source3.shunt().pipe(pluck("source"),_.compact);
+const sourceFusing2 = source3.shunt().pipe(pluck("event"));
 
 sourceFusing1.useStream((res) => {
   console.log("sourceFusing1", res);
@@ -78,14 +74,10 @@ sourceFusing1.useStream((res) => {
 sourceFusing2.useStream((res) => {
   console.log("sourceFusing2", res);
 });
-// source3.useStream((res) => {
-//   console.log("res: ", res);
-// });
+
 
 const filter = document.querySelector("#filter");
 filter.addEventListener(
   "click",
-  source3.useEventStream((data) => {
-    console.log("data: ", data);
-  }, true)
+  source3.useEventStream((data) => data, true)
 );
