@@ -29,7 +29,6 @@ const source = new Stream(
 ).pipe(pluck("channels"));
 
 source.useStream((res) => {
-  console.log("res: ", res);
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -44,7 +43,6 @@ source.useStream((res) => {
   });
 });
 source.useStream((res) => {
-  console.log("res: ", res);
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -64,7 +62,6 @@ const source1 = new Stream(
 ).pipe(pluck("song", "0", "url"));
 
 source1.useStream((url: string) => {
-  console.log("url: ", url);
   const btn = document.querySelector("#btn");
   btn.addEventListener("click", () => {
     window.open(url);
@@ -87,10 +84,6 @@ click.addEventListener(
 // //filter
 
 const source3 = new Stream([0, 1, false, 2, "", 3]).pipe(
-  (d) => {
-    console.log(d);
-    return d;
-  },
   pluck("source"),
   _.compact
 );

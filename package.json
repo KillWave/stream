@@ -5,8 +5,7 @@
   "main": "rollup.config.js",
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "install": "yarn install"
+    "dev": "rollup -c -w"
   },
   "repository": {
     "type": "git",
