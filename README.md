@@ -85,8 +85,8 @@ click.addEventListener(
 
 const source3 = new Stream([0, 1, false, 2, "", 3]);
 
-const sourceFusing1 = source3.shunt().pipe(pluck("source"),_.compact);
-const sourceFusing2 = source3.shunt().pipe(pluck("event"));
+const sourceFusing1 = source3.createShunt().pipe(pluck("source"),_.compact);
+const sourceFusing2 = source3.createShunt().pipe(pluck("event"));
 
 sourceFusing1.useStream((res) => {
   console.log("sourceFusing1", res);

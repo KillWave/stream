@@ -75,7 +75,7 @@ export default class Stream {
       return this.useStream(callback, isshunt);
     };
   }
-  public shunt() {
+  public createShunt() {
     this.isshunt = true;
     return this;
   }
