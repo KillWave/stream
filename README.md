@@ -18,17 +18,16 @@ For frameworks of component systems, such as React, Vue.js, etc., communication 
 ## Simple Usage
 
 ```js
-import {createStream} from "./core/stream";
+import {createStream,createShunt} from "./core";
 import pluck from "./operator/pluck";
-import _ from "lodash";
-import { createShunt } from './core/shunt'
+import {compact} from "lodash-es";
 const source = createStream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
     res.json()
   )
 ).pipe(pluck("channels"));
 
-source.useStream((res) => {
+source.useStream((res:Array<any>) => {
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -42,7 +41,7 @@ source.useStream((res) => {
     box.appendChild(li);
   });
 });
-source.useStream((res) => {
+source.useStream((res:Array<any>) => {
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -88,7 +87,7 @@ const source3 = createStream([0, 1, false, 2, "", 3]);
 
 
 
-const sourceFusing1 = createShunt(source3).pipe(pluck("source"), _.compact);
+const sourceFusing1 = createShunt(source3).pipe(pluck("source"),compact);
 const sourceFusing2 = createShunt(source3).pipe(pluck("event"));
 
 sourceFusing1.useStream((res) => {
