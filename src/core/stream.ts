@@ -53,10 +53,6 @@ export default class Stream {
       return this.useStream(callback);
     };
   }
-  public setPipe(pipes: Array<(d: unknown) => unknown> = []): Stream {
-    this.pipes = pipes;
-    return this;
-  }
   public setSource(source: Source): Stream {
     this.source = source;
     return this
