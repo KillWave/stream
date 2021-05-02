@@ -13,7 +13,7 @@ export default class Aop {
     public before(methodName: string, fn:(d:unknown)=>unknown) {
         //保存原方法
         const original = this.target[methodName];
-        this.target[methodName] = (...args) => {
+        this.target[methodName] = (...args:unknown[]) => {
             // 执行前置函数，返回值可能是 Boolean 或 Promise
             const flag = fn.apply(this.target, args)
             if (flag instanceof Promise) {
@@ -32,7 +32,7 @@ export default class Aop {
      */
     public after(methodName: string, fn:(d:unknown)=>unknown) {
         const original = this.target[methodName]
-        this.target[methodName] = (...args) => {
+        this.target[methodName] = (...args:unknown[]) => {
             // 原函数返回值，可能会是 Paomise
             let rt = original.apply(this.target, args)
             // 原函数的返回值是 Promise
