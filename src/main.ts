@@ -1,7 +1,6 @@
-import {createStream} from "./core/stream";
+import {createStream,createShunt} from "./core";
 import pluck from "./operator/pluck";
 import {compact} from "lodash-es";
-import { createShunt } from './core/shunt'
 const source = createStream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
     res.json()
