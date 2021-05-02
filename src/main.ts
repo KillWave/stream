@@ -1,7 +1,8 @@
-import Stream from "./core/stream";
+import {createStream} from "./core/stream";
 import pluck from "./operator/pluck";
 import _ from "lodash";
-const source = new Stream(
+import { createShunt } from './core/shunt'
+const source = createStream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
     res.json()
   )
@@ -36,7 +37,7 @@ source.useStream((res) => {
   });
 });
 
-const source1 = new Stream(
+const source1 = createStream(
   fetch("http://api.jirengu.com/fm/v2/getSong.php").then((res) => res.json())
 ).pipe(pluck("song", "0", "url"));
 
@@ -49,7 +50,7 @@ source1.useStream((url: string) => {
 });
 
 // //event
-const source2 = new Stream(
+const source2 = createStream(
   fetch("http://api.jirengu.com/getWeather.php").then((res) => res.json())
 ).pipe(pluck("source", "result"));
 
@@ -63,10 +64,12 @@ click.addEventListener(
 
 // 分流
 
-const source3 = new Stream([0, 1, false, 2, "", 3]);
+const source3 = createStream([0, 1, false, 2, "", 3]);
 
-const sourceFusing1 = source3.createShunt().pipe(pluck("source"),_.compact);
-const sourceFusing2 = source3.createShunt().pipe(pluck("event"));
+
+
+const sourceFusing1 = createShunt(source3).pipe(pluck("source"), _.compact);
+const sourceFusing2 = createShunt(source3).pipe(pluck("event"));
 
 sourceFusing1.useStream((res) => {
   console.log("sourceFusing1", res);
@@ -76,8 +79,9 @@ sourceFusing2.useStream((res) => {
 });
 
 
+
 const filter = document.querySelector("#filter");
 filter.addEventListener(
   "click",
-  source3.useEventStream((data) => data,true)
+  source3.useEventStream((data) => data)
 );

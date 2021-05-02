@@ -1,10 +1,16 @@
 import Stream from "./stream";
+import Aop from './aop'
 
-export default function (fusingSource, pipes, callback) {
-  const len = pipes.length;
-  for (let i = 0; i < len; i++) {
-    const stream = new Stream(fusingSource);
-    stream.setPipe(pipes[i]);
-    stream.useStream(callback[i]);
-  }
+export function createShunt(stream) {
+  const prentAop = new Aop(stream);
+  const shuntStream = new Stream();
+  const shuntAop = new Aop(shuntStream);
+  let shuntCallback;
+  shuntAop.before("useStream", (args) => {
+    shuntCallback = args;
+  })
+  prentAop.after("useStream",  (args) => {
+     shuntStream.setSource(args).useStream(shuntCallback)
+  })
+  return shuntStream
 }
