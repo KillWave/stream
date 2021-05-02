@@ -1,6 +1,6 @@
 import {createStream} from "./core/stream";
 import pluck from "./operator/pluck";
-import _ from "lodash";
+import {compact} from "lodash-es";
 import { createShunt } from './core/shunt'
 const source = createStream(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
@@ -68,7 +68,7 @@ const source3 = createStream([0, 1, false, 2, "", 3]);
 
 
 
-const sourceFusing1 = createShunt(source3).pipe(pluck("source"), _.compact);
+const sourceFusing1 = createShunt(source3).pipe(pluck("source"),compact);
 const sourceFusing2 = createShunt(source3).pipe(pluck("event"));
 
 sourceFusing1.useStream((res) => {
