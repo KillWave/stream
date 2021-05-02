@@ -8,7 +8,6 @@ export default class Aop {
   * 前置切入
   * @param {Function} method 目标函数
   * @param {Function} fn 切入函数，返回 Boolean / Promise
-  * @param {Object} target 目标对象
   */
     public before(methodName: string, fn:(d:unknown)=>unknown) {
         //保存原方法
@@ -28,7 +27,6 @@ export default class Aop {
      * 后置切入
      * @param {Function} method 目标函数
      * @param {Function} fn 切入函数
-     * @param {Object} target 目标对象
      */
     public after(methodName: string, fn:(d:unknown)=>unknown) {
         const original = this.target[methodName]
