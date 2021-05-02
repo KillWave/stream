@@ -1,7 +1,13 @@
 
-interface SourceEvent {
-  event: DocumentEvent;
-  source: unknown;
+
+class SourceEvent {
+  public event: Event;
+  public source: unknown;
+  constructor(event: Event, source: unknown) {
+    this.event = event;
+    this.source = source;
+  }
+
 }
 export type Source = SourceEvent | unknown
 export default class Stream {
@@ -20,7 +26,7 @@ export default class Stream {
     }
     return this;
   }
-  public async useStream(callback: (d:unknown) => unknown): Promise<unknown> | undefined {
+  public async useStream(callback: (d: unknown) => unknown): Promise<unknown> | undefined {
     if (this.source) return callback(await this.usePipes());
   }
   private usePipes(): Promise<unknown> {
@@ -36,15 +42,18 @@ export default class Stream {
     callback: (d: unknown) => unknown
   ): (e: Event) => Promise<unknown> | undefined {
     return (e: Event) => {
+      if (this.source instanceof SourceEvent) {
+        this.source.event = e;
+      }
       if (this.firstExecution) {
-        this.source = { event: e, source: this.source };
+        this.source = new SourceEvent(e, this.source);
         this.cache = null;
         this.firstExecution = false;
       }
       return this.useStream(callback);
     };
   }
-  public setPipe(pipes: Array<(d: unknown) => unknown> = []):Stream {
+  public setPipe(pipes: Array<(d: unknown) => unknown> = []): Stream {
     this.pipes = pipes;
     return this;
   }
