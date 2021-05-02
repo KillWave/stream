@@ -36,7 +36,7 @@ export default class Aop {
             // 原函数返回值，可能会是 Paomise
             let rt = original.apply(this.target, args)
             // 原函数的返回值是 Promise
-            if (Promise && rt instanceof Promise) {
+            if (rt instanceof Promise) {
                 rt.then(res => {
                     // 执行后置切入函数
                     fn(res)

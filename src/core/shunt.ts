@@ -1,4 +1,4 @@
-import Stream,{Source} from "./stream";
+import Stream from "./stream";
 import Aop from './aop'
 
 export function createShunt(stream:Stream):Stream {
@@ -9,7 +9,7 @@ export function createShunt(stream:Stream):Stream {
   shuntAop.before("useStream", (args:(d:unknown)=>unknown) => {
     shuntCallback = args;
   })
-  prentAop.after("useStream",  (source:Source) => {
+  prentAop.after("useStream",  (source:unknown) => {
      shuntStream.setSource(source).useStream(shuntCallback)
   })
   return shuntStream

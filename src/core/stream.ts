@@ -5,9 +5,8 @@ interface SourceEvent {
 }
 export type Source = SourceEvent | unknown
 export default class Stream {
-  private source: Source;
+  private source: Source = null;
   private cache: Promise<unknown> | null = null;
-  private pending: Boolean = false;
   private pipes: Array<(d: unknown) => unknown> = [];
   private firstExecution: Boolean = true;
   constructor(source?: Source) {
@@ -21,18 +20,11 @@ export default class Stream {
     }
     return this;
   }
-  public useStream(callback: (unknown) => unknown): Promise<unknown> | undefined {
-    if (this.source) {
-      return this.usePipes()
-        .then((d) => {
-          this.pending = false;
-          return callback(d);
-        })
-    }
+  public async useStream(callback: (d:unknown) => unknown): Promise<unknown> | undefined {
+    if (this.source) return callback(await this.usePipes());
   }
   private usePipes(): Promise<unknown> {
-    if (!this.cache && !this.pending) {
-      this.pending = true;
+    if (!this.cache) {
       this.cache = this.pipes.reduce(this.execute, this.source) as Promise<unknown>;
     }
     return this.cache instanceof Promise ? this.cache : Promise.resolve(this.cache);
@@ -61,7 +53,6 @@ export default class Stream {
     return this
   }
 }
-
 export function createStream(source: Source): Stream {
   return new Stream(source)
 }

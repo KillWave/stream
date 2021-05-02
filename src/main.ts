@@ -8,7 +8,7 @@ const source = createStream(
   )
 ).pipe(pluck("channels"));
 
-source.useStream((res) => {
+source.useStream((res:Array<any>) => {
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -22,7 +22,7 @@ source.useStream((res) => {
     box.appendChild(li);
   });
 });
-source.useStream((res) => {
+source.useStream((res:Array<any>) => {
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
