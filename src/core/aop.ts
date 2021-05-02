@@ -1,6 +1,7 @@
+
 export default class Aop {
-    private target
-    constructor(target) {
+    private target:unknown
+    constructor(target:unknown) {
         this.target = target
     }
     /**
@@ -9,7 +10,7 @@ export default class Aop {
   * @param {Function} fn 切入函数，返回 Boolean / Promise
   * @param {Object} target 目标对象
   */
-    public before(methodName: string, fn) {
+    public before(methodName: string, fn:(d:unknown)=>unknown) {
         //保存原方法
         const original = this.target[methodName];
         this.target[methodName] = (...args) => {
@@ -29,7 +30,7 @@ export default class Aop {
      * @param {Function} fn 切入函数
      * @param {Object} target 目标对象
      */
-    public after(methodName: string, fn) {
+    public after(methodName: string, fn:(d:unknown)=>unknown) {
         const original = this.target[methodName]
         this.target[methodName] = (...args) => {
             // 原函数返回值，可能会是 Paomise
