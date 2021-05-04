@@ -1,9 +1,9 @@
 export default function pluck(...args: string[]) {
-  return async (d) => {
+  return async (value:unknown) => {
     let key: string;
     while ((key = args.shift())) {
-      d = await d[key];
+      value = await value[key];
     }
-    return d;
+    return value;
   };
 }

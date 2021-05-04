@@ -18,16 +18,16 @@ For frameworks of component systems, such as React, Vue.js, etc., communication 
 ## Simple Usage
 
 ```js
-import {createStream,createShunt} from "./core";
+import {chain} from "./core";
 import pluck from "./operator/pluck";
-import {compact} from "lodash-es";
-const source = createStream(
+import { compact } from "lodash-es";
+const source = chain(
   fetch("http://api.jirengu.com/fm/v2/getChannels.php").then((res) =>
     res.json()
   )
 ).pipe(pluck("channels"));
 
-source.useStream((res:Array<any>) => {
+source.commit().then((res: Array<any>) => {
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -41,7 +41,8 @@ source.useStream((res:Array<any>) => {
     box.appendChild(li);
   });
 });
-source.useStream((res:Array<any>) => {
+source.commit().then((res: Array<any>) => {
+  console.log(111, res)
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -56,11 +57,11 @@ source.useStream((res:Array<any>) => {
   });
 });
 
-const source1 = createStream(
+const source1 = chain(
   fetch("http://api.jirengu.com/fm/v2/getSong.php").then((res) => res.json())
 ).pipe(pluck("song", "0", "url"));
 
-source1.useStream((url: string) => {
+source1.commit().then((url: string) => {
   console.log("url: ", url);
   const btn = document.querySelector("#btn");
   btn.addEventListener("click", () => {
@@ -69,32 +70,31 @@ source1.useStream((url: string) => {
 });
 
 // //event
-const source2 = createStream(
+const source2 = chain(
   fetch("http://api.jirengu.com/getWeather.php").then((res) => res.json())
-).pipe(pluck("source", "result"));
+).pipe(pluck("result"));
 
 const click = document.querySelector("#click");
 click.addEventListener(
   "click",
-  source2.useEventStream((data) => {
-    alert(JSON.stringify(data));
-  })
+  (e) => {
+    source2.commit().then(res => {
+      alert(JSON.stringify(res))
+      console.log(e)
+    })
+  }
 );
 
-// 分流
 
-const source3 = createStream([0, 1, false, 2, "", 3]);
-
+const source3 = chain([0, 1, false, 2, "", 3]);
 
 
-const sourceFusing1 = createShunt(source3).pipe(pluck("source"),compact);
-const sourceFusing2 = createShunt(source3).pipe(pluck("event"));
 
-sourceFusing1.useStream((res) => {
+const sourceFusing1 = chain(source3).pipe(compact);
+const sourceFusing2 = chain().pipe((d: MouseEvent) => d.type);
+
+sourceFusing1.commit().then((res) => {
   console.log("sourceFusing1", res);
-});
-sourceFusing2.useStream((res) => {
-  console.log("sourceFusing2", res);
 });
 
 
@@ -102,9 +102,14 @@ sourceFusing2.useStream((res) => {
 const filter = document.querySelector("#filter");
 filter.addEventListener(
   "click",
-  source3.useEventStream((data) => data)
-);
+  (e) => {
+    sourceFusing2.commit(e).then((res) => {
+      console.log(res)
+      alert(res)
+    });
 
+  }
+);
 
 ```
 
