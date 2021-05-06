@@ -1,4 +1,4 @@
-import {chain} from "./core";
+import { chain } from "./core";
 import pluck from "./operator/pluck";
 import { compact } from "lodash-es";
 const source = chain(
@@ -22,7 +22,7 @@ source.commit().then((res: Array<any>) => {
   });
 });
 source.commit().then((res: Array<any>) => {
-  console.log(111, res)
+  console.log(111, res);
   const box = document.querySelector("#box");
   res.forEach((item) => {
     const li = document.createElement("li");
@@ -55,38 +55,26 @@ const source2 = chain(
 ).pipe(pluck("result"));
 
 const click = document.querySelector("#click");
-click.addEventListener(
-  "click",
-  (e) => {
-    source2.commit().then(res => {
-      alert(JSON.stringify(res))
-      console.log(e)
-    })
-  }
-);
-
+click.addEventListener("click", (e) => {
+  source2.commit().then((res) => {
+    alert(JSON.stringify(res));
+    console.log(e);
+  });
+});
 
 const source3 = chain([0, 1, false, 2, "", 3]);
 
-
-
 const sourceFusing1 = chain(source3).pipe(compact);
-const sourceFusing2 = chain().pipe((d: MouseEvent) => d.type);
+const sourceFusing2 = chain().pipe(pluck("type"));
 
 sourceFusing1.commit().then((res) => {
   console.log("sourceFusing1", res);
 });
 
-
-
 const filter = document.querySelector("#filter");
-filter.addEventListener(
-  "click",
-  (e) => {
-    sourceFusing2.commit(e).then((res) => {
-      console.log(res)
-      alert(res)
-    });
-
-  }
-);
+filter.addEventListener("click", (e) => {
+  sourceFusing2.commit(e).then((res) => {
+    console.log(res);
+    alert(res);
+  });
+});
