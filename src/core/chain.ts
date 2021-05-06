@@ -1,6 +1,7 @@
 class Chain {
   public value: unknown = null;
   private pipes: Array<(d: unknown) => unknown> = [];
+  private cache: unknown = null;
   constructor(value?: unknown) {
     this.value = value;
   }
@@ -13,11 +14,16 @@ class Chain {
     return this;
   }
   public commit(value?: unknown): Promise<unknown> {
-    const data = this.pipes.reduce(
-      this.execute,
-      value ? value : this.value
-    ) as Promise<unknown>;
-    return data instanceof Promise ? data : Promise.resolve(data);
+    if (!this.cache) {
+      this.cache = this.pipes.reduce(
+        this.execute,
+        value ? value : this.value
+      ) as Promise<unknown>;
+    }
+
+    return this.cache instanceof Promise
+      ? this.cache
+      : Promise.resolve(this.cache);
   }
   private async execute(
     prve: Promise<unknown> | unknown,
