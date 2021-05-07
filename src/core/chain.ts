@@ -20,10 +20,14 @@ class Chain {
         value ? value : this.value
       ) as Promise<unknown>;
     }
-
     return this.cache instanceof Promise
       ? this.cache
       : Promise.resolve(this.cache);
+  }
+  public clear() {
+    this.cache = null;
+
+    return this;
   }
   private async execute(
     prve: Promise<unknown> | unknown,
@@ -32,7 +36,7 @@ class Chain {
     return curr(await prve);
   }
 }
-export function chain(value?: unknown | Chain): Chain {
+export default function chain(value?: unknown | Chain): Chain {
   if (value instanceof Chain) {
     return new Chain(value.value);
   }

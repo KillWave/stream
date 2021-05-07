@@ -1,4 +1,4 @@
-import { chain } from "./core";
+import chain from "./core/chain";
 import pluck from "./operator/pluck";
 import { compact } from "lodash-es";
 const source = chain(
@@ -73,8 +73,11 @@ sourceFusing1.commit().then((res) => {
 
 const filter = document.querySelector("#filter");
 filter.addEventListener("click", (e) => {
-  sourceFusing2.commit(e).then((res) => {
-    console.log(res);
-    alert(res);
-  });
+  sourceFusing2
+    .clear()
+    .commit(e)
+    .then((res) => {
+      console.log(res);
+      alert(res);
+    });
 });
